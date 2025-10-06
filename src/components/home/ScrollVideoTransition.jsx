@@ -49,71 +49,15 @@ const ScrollVideoTransition = () => {
 
     if (!container || !video || !videoWrapper) return
 
-    // Entry animation - slides in from right
-    gsap.fromTo(container,
-      {
-        x: '120%',
-        opacity: 0
-      },
-      {
-        x: '0%',
-        opacity: 1,
-        duration: 1,
-        ease: 'power4.out',
-        scrollTrigger: {
-          trigger: container,
-          start: 'top 80%',
-          end: 'top 50%',
-          scrub: 1,
-          onEnter: () => {
-            if (video.paused) video.play().catch(e => console.warn('Play failed:', e))
-          }
-        }
-      }
-    )
-
-    gsap.fromTo(videoWrapper,
-      {
-        scale: 0.85,
-        rotateY: 12,
-        filter: 'blur(10px)'
-      },
-      {
-        scale: 1,
-        rotateY: 0,
-        filter: 'blur(0px)',
-        duration: 1,
-        ease: 'power4.out',
-        scrollTrigger: {
-          trigger: container,
-          start: 'top 80%',
-          end: 'top 50%',
-          scrub: 1
-        }
-      }
-    )
-
-    // Exit animation - only when scrolled way past
-    gsap.to(videoWrapper, {
-      scale: 0.85,
-      rotateY: -12,
-      filter: 'blur(10px)',
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: container,
-        start: 'bottom 30%',
+        start: 'top bottom',
         end: 'bottom top',
-        scrub: 1
-      }
-    })
-
-    gsap.to(container, {
-      x: '-120%',
-      opacity: 0,
-      scrollTrigger: {
-        trigger: container,
-        start: 'bottom 30%',
-        end: 'bottom top',
-        scrub: 1,
+        scrub: 1.5,
+        onEnter: () => {
+          if (video.paused) video.play().catch(e => console.warn('Play failed:', e))
+        },
         onLeave: () => {
           video.pause()
         },
@@ -125,6 +69,62 @@ const ScrollVideoTransition = () => {
         }
       }
     })
+
+    tl.fromTo(container,
+      {
+        x: '120%',
+        opacity: 0
+      },
+      {
+        x: '0%',
+        opacity: 1,
+        duration: 0.35,
+        ease: 'power4.out'
+      }
+    )
+    .fromTo(videoWrapper,
+      {
+        scale: 0.85,
+        rotateY: 12,
+        filter: 'blur(10px)'
+      },
+      {
+        scale: 1,
+        rotateY: 0,
+        filter: 'blur(0px)',
+        duration: 0.35,
+        ease: 'power4.out'
+      },
+      '<'
+    )
+
+    .to([container, videoWrapper], {
+      x: '0%',
+      scale: 1,
+      rotateY: 0,
+      opacity: 1,
+      filter: 'blur(0px)',
+      duration: 0.3
+    })
+
+    .to(videoWrapper,
+      {
+        scale: 0.85,
+        rotateY: -12,
+        filter: 'blur(10px)',
+        duration: 0.35,
+        ease: 'power4.in'
+      }
+    )
+    .to(container,
+      {
+        x: '-120%',
+        opacity: 0,
+        duration: 0.35,
+        ease: 'power4.in'
+      },
+      '<'
+    )
 
   }, [])
 
