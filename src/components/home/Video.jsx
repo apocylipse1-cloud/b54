@@ -185,7 +185,9 @@ const Video = () => {
           width: '100%',
           height: '100%',
           opacity: isLoaded && !hasError ? 1 : 0,
-          transition: 'opacity 0.5s ease-in-out'
+          transition: 'opacity 0.5s ease-in-out',
+          transform: 'translate3d(0, 0, 0)',
+          willChange: isLoaded ? 'auto' : 'opacity'
         }}
         // CRITICAL iOS Safari attributes - order matters!
         muted
@@ -193,7 +195,8 @@ const Video = () => {
         autoPlay
         playsInline
         loop
-        preload={isMobile ? 'none' : 'metadata'}
+        preload="metadata"
+        poster="/video-fallback.jpg"
         webkit-playsinline="true"
         x-webkit-airplay="allow"
         onError={(e) => {

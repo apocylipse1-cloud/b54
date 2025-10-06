@@ -11,11 +11,18 @@ const MouseFollower = () => {
     if (!container) return
 
     const handleMouseMove = (e) => {
-      const rect = container.getBoundingClientRect()
-      mousePos.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
+      // Use requestAnimationFrame for smooth updates
+      if (animationFrame.current) {
+        cancelAnimationFrame(animationFrame.current)
       }
+
+      animationFrame.current = requestAnimationFrame(() => {
+        const rect = container.getBoundingClientRect()
+        mousePos.current = {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        }
+      })
     }
 
     const handleMouseEnter = () => {
@@ -33,8 +40,8 @@ const MouseFollower = () => {
       setParticles(newParticles)
     }
 
-    container.addEventListener('mousemove', handleMouseMove)
-    container.addEventListener('mouseenter', handleMouseEnter)
+    container.addEventListener('mousemove', handleMouseMove, { passive: true })
+    container.addEventListener('mouseenter', handleMouseEnter, { passive: true })
 
     return () => {
       container.removeEventListener('mousemove', handleMouseMove)
@@ -76,8 +83,17 @@ const MouseFollower = () => {
     <div
       ref={containerRef}
       className="absolute inset-0 pointer-events-none overflow-hidden"
+      style={{
+        transform: 'translate3d(0, 0, 0)',
+        willChange: 'contents'
+      }}
     >
-      <svg className="absolute inset-0 w-full h-full">
+      <svg
+        className="absolute inset-0 w-full h-full"
+        style={{
+          transform: 'translate3d(0, 0, 0)'
+        }}
+      >
         <defs>
           <radialGradient id="particleGradient">
             <stop offset="0%" stopColor="#D3FD50" stopOpacity="0.8" />

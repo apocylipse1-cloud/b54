@@ -16,7 +16,7 @@ const ScrollVideoTransition = () => {
     video.muted = true
     video.volume = 0
     video.playsInline = true
-    video.preload = 'auto'
+    video.preload = 'metadata'
 
     video.style.transform = 'translateZ(0)'
     video.style.backfaceVisibility = 'hidden'
@@ -151,13 +151,16 @@ const ScrollVideoTransition = () => {
           autoPlay
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
+          poster="/video-fallback.jpg"
           webkit-playsinline="true"
           disablePictureInPicture
           controlsList="nodownload nofullscreen noremoteplayback"
           style={{
             objectFit: 'cover',
-            imageRendering: 'high-quality'
+            imageRendering: 'high-quality',
+            transform: 'translate3d(0, 0, 0)',
+            backfaceVisibility: 'hidden'
           }}
         >
           <source src="/gemini.webm" type="video/webm" />

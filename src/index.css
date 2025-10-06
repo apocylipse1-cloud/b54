@@ -2368,3 +2368,220 @@ iframe {
         font-family: font2, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 }
+
+/* ================================================
+   PERFORMANCE OPTIMIZATION LAYER
+   Critical CSS for maximum smoothness
+   ================================================ */
+
+/* Hardware acceleration for animated elements */
+.hero-background-video,
+.hero-video-container,
+.video-wrapper,
+.animated-text,
+.scroll-trigger-element,
+.carousel-item,
+.modal-overlay,
+.modal-content {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+/* Optimize will-change for actively animating elements */
+.animating {
+  will-change: transform, opacity;
+}
+
+.animating-complete {
+  will-change: auto;
+}
+
+/* Smooth scroll performance with contain */
+.scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+/* GPU-accelerated transforms for GSAP animations */
+[data-gsap] {
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+}
+
+/* Optimize video rendering */
+video {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Reduce paint during scroll */
+.section-dark,
+.section-light {
+  contain: layout style paint;
+  content-visibility: auto;
+}
+
+/* Optimize glassmorphism rendering */
+.glass,
+.glass-hover,
+.floating-panel,
+.floating-panel-dark {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .glass-hover:hover,
+  .floating-panel:hover,
+  .floating-panel-dark:hover {
+    will-change: transform, box-shadow;
+  }
+}
+
+/* Image loading optimization */
+img {
+  content-visibility: auto;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+img[loading="lazy"] {
+  content-visibility: auto;
+}
+
+/* Reduce layout shift */
+.hero-video-container,
+.video-container {
+  contain: layout;
+}
+
+/* Optimize form inputs */
+input,
+textarea,
+select {
+  contain: layout style;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Optimize button interactions */
+button,
+.btn-pill,
+.btn-primary {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  touch-action: manipulation;
+}
+
+/* Smooth transitions with GPU */
+.transition-smooth {
+  transition-property: transform, opacity, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translate3d(0, 0, 0);
+}
+
+/* Optimize SVG rendering */
+svg {
+  transform: translate3d(0, 0, 0);
+  shape-rendering: geometricPrecision;
+}
+
+/* Prevent layout thrashing on resize */
+@media (min-width: 768px) {
+  * {
+    contain: layout;
+  }
+}
+
+/* Optimize animation performance */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate3d(0, 20px, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+/* Passive event listener hint */
+.scroll-listener {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimize modal animations */
+.modal-enter {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.modal-exit {
+  animation: fadeIn 0.2s ease-in reverse forwards;
+}
+
+/* Reduce repaints during scroll */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  contain: layout style;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  z-index: 1000;
+}
+
+/* Critical rendering path optimization */
+.above-fold {
+  content-visibility: visible;
+}
+
+.below-fold {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* Font rendering optimization */
+body,
+p,
+span,
+div {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimize backdrop filters */
+.backdrop-blur {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transform: translate3d(0, 0, 0);
+}
+
+/* Reduce composite layers */
+.composite-layer {
+  isolation: isolate;
+  contain: layout paint;
+}
+
+/* ================================================
+   END PERFORMANCE OPTIMIZATION LAYER
+   ================================================ */

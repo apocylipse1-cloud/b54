@@ -1,14 +1,30 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 
 const LogoVideo = () => {
   const videoRef = useRef(null)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     const video = videoRef.current
-    if (video) {
+    if (!video) return
+
+    const handleLoadedData = () => {
+      setIsLoaded(true)
       video.play().catch(err => {
         console.log('Autoplay prevented:', err)
       })
+    }
+
+    const handleError = () => {
+      console.warn('Logo video failed to load')
+    }
+
+    video.addEventListener('loadeddata', handleLoadedData)
+    video.addEventListener('error', handleError)
+
+    return () => {
+      video.removeEventListener('loadeddata', handleLoadedData)
+      video.removeEventListener('error', handleError)
     }
   }, [])
 
@@ -20,8 +36,16 @@ const LogoVideo = () => {
           className="w-full h-full object-cover"
           muted
           playsInline
-          preload="auto"
-          style={{ display: 'block' }}
+          preload="metadata"
+          poster="/logo.png"
+          style={{
+            display: 'block',
+            transform: 'translate3d(0, 0, 0)',
+            willChange: isLoaded ? 'auto' : 'opacity',
+            opacity: isLoaded ? 1 : 0,
+            transition: 'opacity 0.3s ease-in-out'
+          }}
+          webkit-playsinline="true"
         >
           <source src="/logovideo.webm" type="video/webm" />
           <source src="/logovideo.mp4" type="video/mp4" />
