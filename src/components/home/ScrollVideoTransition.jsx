@@ -16,7 +16,7 @@ const ScrollVideoTransition = () => {
     video.muted = true
     video.volume = 0
     video.playsInline = true
-    video.preload = 'metadata'
+    video.preload = 'auto'
 
     video.style.transform = 'translateZ(0)'
     video.style.backfaceVisibility = 'hidden'
@@ -49,23 +49,11 @@ const ScrollVideoTransition = () => {
 
     if (!container || !video || !videoWrapper) return
 
-    // Set initial state - hidden before scroll
-    gsap.set(container, {
-      x: '120%',
-      opacity: 0
-    })
-    gsap.set(videoWrapper, {
-      scale: 0.85,
-      rotateY: 12,
-      filter: 'blur(10px)'
-    })
-
-    // Create main timeline with 3 distinct phases
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: container,
-        start: 'top 80%', // Start when element is 80% down the viewport
-        end: 'bottom top', // End when element leaves viewport
+        start: 'top bottom',
+        end: 'bottom top',
         scrub: 1.5,
         onEnter: () => {
           if (video.paused) video.play().catch(e => console.warn('Play failed:', e))
@@ -82,43 +70,49 @@ const ScrollVideoTransition = () => {
       }
     })
 
-    // Phase 1: Enter animation (slides in from right)
-    tl.to(container,
+    tl.fromTo(container,
+      {
+        x: '120%',
+        opacity: 0
+      },
       {
         x: '0%',
         opacity: 1,
-        duration: 0.25,
+        duration: 0.35,
         ease: 'power4.out'
       }
     )
-    .to(videoWrapper,
+    .fromTo(videoWrapper,
+      {
+        scale: 0.85,
+        rotateY: 12,
+        filter: 'blur(10px)'
+      },
       {
         scale: 1,
         rotateY: 0,
         filter: 'blur(0px)',
-        duration: 0.25,
+        duration: 0.35,
         ease: 'power4.out'
       },
       '<'
     )
 
-    // Phase 2: Stay fixed/visible (hold position)
     .to([container, videoWrapper], {
       x: '0%',
       scale: 1,
       rotateY: 0,
       opacity: 1,
       filter: 'blur(0px)',
-      duration: 0.5 // Longer duration = more time stationary
+      duration: 0.3
     })
 
-    // Phase 3: Exit animation (slides out to left)
     .to(videoWrapper,
       {
         scale: 0.85,
         rotateY: -12,
         filter: 'blur(10px)',
-        duration: 0.25,
+        duration: 0.35,
         ease: 'power4.in'
       }
     )
@@ -126,7 +120,7 @@ const ScrollVideoTransition = () => {
       {
         x: '-120%',
         opacity: 0,
-        duration: 0.25,
+        duration: 0.35,
         ease: 'power4.in'
       },
       '<'
@@ -157,16 +151,13 @@ const ScrollVideoTransition = () => {
           autoPlay
           loop
           playsInline
-          preload="metadata"
-          poster="/video-fallback.jpg"
+          preload="auto"
           webkit-playsinline="true"
           disablePictureInPicture
           controlsList="nodownload nofullscreen noremoteplayback"
           style={{
             objectFit: 'cover',
-            imageRendering: 'high-quality',
-            transform: 'translate3d(0, 0, 0)',
-            backfaceVisibility: 'hidden'
+            imageRendering: 'high-quality'
           }}
         >
           <source src="/gemini.webm" type="video/webm" />
