@@ -49,11 +49,23 @@ const ScrollVideoTransition = () => {
 
     if (!container || !video || !videoWrapper) return
 
+    // Set initial state - hidden before scroll
+    gsap.set(container, {
+      x: '120%',
+      opacity: 0
+    })
+    gsap.set(videoWrapper, {
+      scale: 0.85,
+      rotateY: 12,
+      filter: 'blur(10px)'
+    })
+
+    // Create main timeline with 3 distinct phases
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: container,
-        start: 'top bottom',
-        end: 'bottom top',
+        start: 'top 80%', // Start when element is 80% down the viewport
+        end: 'bottom top', // End when element leaves viewport
         scrub: 1.5,
         onEnter: () => {
           if (video.paused) video.play().catch(e => console.warn('Play failed:', e))
@@ -70,49 +82,43 @@ const ScrollVideoTransition = () => {
       }
     })
 
-    tl.fromTo(container,
-      {
-        x: '120%',
-        opacity: 0
-      },
+    // Phase 1: Enter animation (slides in from right)
+    tl.to(container,
       {
         x: '0%',
         opacity: 1,
-        duration: 0.35,
+        duration: 0.25,
         ease: 'power4.out'
       }
     )
-    .fromTo(videoWrapper,
-      {
-        scale: 0.85,
-        rotateY: 12,
-        filter: 'blur(10px)'
-      },
+    .to(videoWrapper,
       {
         scale: 1,
         rotateY: 0,
         filter: 'blur(0px)',
-        duration: 0.35,
+        duration: 0.25,
         ease: 'power4.out'
       },
       '<'
     )
 
+    // Phase 2: Stay fixed/visible (hold position)
     .to([container, videoWrapper], {
       x: '0%',
       scale: 1,
       rotateY: 0,
       opacity: 1,
       filter: 'blur(0px)',
-      duration: 0.3
+      duration: 0.5 // Longer duration = more time stationary
     })
 
+    // Phase 3: Exit animation (slides out to left)
     .to(videoWrapper,
       {
         scale: 0.85,
         rotateY: -12,
         filter: 'blur(10px)',
-        duration: 0.35,
+        duration: 0.25,
         ease: 'power4.in'
       }
     )
@@ -120,7 +126,7 @@ const ScrollVideoTransition = () => {
       {
         x: '-120%',
         opacity: 0,
-        duration: 0.35,
+        duration: 0.25,
         ease: 'power4.in'
       },
       '<'
