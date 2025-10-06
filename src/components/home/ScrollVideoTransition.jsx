@@ -25,21 +25,14 @@ const ScrollVideoTransition = () => {
     const handleLoadedData = () => {
       const playPromise = video.play()
       if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            console.log('Video autoplay successful')
-          })
-          .catch(error => {
-            console.warn('Video autoplay failed:', error)
-          })
+        playPromise.catch(error => {
+          console.warn('Video autoplay failed:', error)
+        })
       }
     }
 
     video.addEventListener('loadeddata', handleLoadedData)
-
-    return () => {
-      video.removeEventListener('loadeddata', handleLoadedData)
-    }
+    return () => video.removeEventListener('loadeddata', handleLoadedData)
   }, [])
 
   useGSAP(() => {
@@ -52,79 +45,53 @@ const ScrollVideoTransition = () => {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: container,
-        start: 'top bottom',
-        end: 'bottom top',
+        start: 'top 85%',     // start when element comes into view
+        end: 'bottom top',    // end when fully scrolled out
         scrub: 1.5,
-        onEnter: () => {
-          if (video.paused) video.play().catch(e => console.warn('Play failed:', e))
-        },
-        onLeave: () => {
-          video.pause()
-        },
-        onEnterBack: () => {
-          if (video.paused) video.play().catch(e => console.warn('Play failed:', e))
-        },
-        onLeaveBack: () => {
-          video.pause()
-        }
+        markers: false,
+        onEnter: () => video.play().catch(e => console.warn('Play failed:', e)),
+        onLeave: () => video.pause(),
+        onEnterBack: () => video.play().catch(e => console.warn('Play failed:', e)),
+        onLeaveBack: () => video.pause()
       }
     })
 
+    // 1️⃣ Slide/Fade In when entering viewport
     tl.fromTo(container,
-      {
-        x: '120%',
-        opacity: 0
-      },
-      {
-        x: '0%',
-        opacity: 1,
-        duration: 0.35,
-        ease: 'power4.out'
-      }
+      { x: '120%', opacity: 0 },
+      { x: '0%', opacity: 1, duration: 0.6, ease: 'power4.out' }
     )
     .fromTo(videoWrapper,
-      {
-        scale: 0.85,
-        rotateY: 12,
-        filter: 'blur(10px)'
-      },
-      {
-        scale: 1,
-        rotateY: 0,
-        filter: 'blur(0px)',
-        duration: 0.35,
-        ease: 'power4.out'
-      },
+      { scale: 0.85, rotateY: 12, filter: 'blur(10px)' },
+      { scale: 1, rotateY: 0, filter: 'blur(0px)', duration: 0.6, ease: 'power4.out' },
       '<'
     )
 
-    .to([container, videoWrapper], {
+    // 2️⃣ Stay fully visible while scrolling within section
+    tl.to([container, videoWrapper], {
       x: '0%',
+      opacity: 1,
       scale: 1,
       rotateY: 0,
-      opacity: 1,
       filter: 'blur(0px)',
-      duration: 0.3
+      duration: 0.6,
+      ease: 'none'
     })
 
-    .to(videoWrapper,
-      {
-        scale: 0.85,
-        rotateY: -12,
-        filter: 'blur(10px)',
-        duration: 0.35,
-        ease: 'power4.in'
-      }
-    )
-    .to(container,
-      {
-        x: '-120%',
-        opacity: 0,
-        duration: 0.35,
-        ease: 'power4.in'
-      },
-      '<'
-    )
+    // 3️⃣ Fade/Slide Out ONLY when scrolled far past
+    tl.to(videoWrapper, {
+      scale: 0.85,
+      rotateY: -12,
+      filter: 'blur(10px)',
+      duration: 0.6,
+      ease: 'power4.in'
+    })
+    .to(container, {
+      x: '-120%',
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power4.in'
+    }, '<')
 
   }, [])
 
