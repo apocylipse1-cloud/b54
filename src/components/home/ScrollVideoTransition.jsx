@@ -42,11 +42,12 @@ const ScrollVideoTransition = () => {
 
     if (!container || !video || !videoWrapper) return
 
+    // 🟩 Main timeline (fade in + hold)
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: container,
-        start: 'top 85%',     // start when element comes into view
-        end: 'bottom top',    // end when fully scrolled out
+        start: 'top 85%',
+        end: '+=200%', // stays visible for longer scroll range
         scrub: 1.5,
         markers: false,
         onEnter: () => video.play().catch(e => console.warn('Play failed:', e)),
@@ -56,18 +57,18 @@ const ScrollVideoTransition = () => {
       }
     })
 
-    // 1️⃣ Slide/Fade In when entering viewport
+    // Fade & slide in
     tl.fromTo(container,
       { x: '120%', opacity: 0 },
-      { x: '0%', opacity: 1, duration: 0.6, ease: 'power4.out' }
+      { x: '0%', opacity: 1, duration: 0.8, ease: 'power4.out' }
     )
     .fromTo(videoWrapper,
       { scale: 0.85, rotateY: 12, filter: 'blur(10px)' },
-      { scale: 1, rotateY: 0, filter: 'blur(0px)', duration: 0.6, ease: 'power4.out' },
+      { scale: 1, rotateY: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power4.out' },
       '<'
     )
 
-    // 2️⃣ Stay fully visible while scrolling within section
+    // Hold visible state
     tl.to([container, videoWrapper], {
       x: '0%',
       opacity: 1,
@@ -78,8 +79,17 @@ const ScrollVideoTransition = () => {
       ease: 'none'
     })
 
-    // 3️⃣ Fade/Slide Out ONLY when scrolled far past
-    tl.to(videoWrapper, {
+    // 🟥 Separate fade-left (starts when scrolled far below)
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: container,
+        start: 'bottom 40%',  // start fading after video almost passes viewport
+        end: 'bottom -20%',   // complete fade when it's gone
+        scrub: 1.5,
+        markers: false
+      }
+    })
+    .to(videoWrapper, {
       scale: 0.85,
       rotateY: -12,
       filter: 'blur(10px)',
