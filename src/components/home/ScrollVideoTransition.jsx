@@ -42,12 +42,12 @@ const ScrollVideoTransition = () => {
 
     if (!container || !video || !videoWrapper) return
 
-    // 🟩 Main timeline (fade in + hold)
+    // 🟩 Main entrance + hold timeline
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: container,
         start: 'top 85%',
-        end: '+=200%', // stays visible for longer scroll range
+        end: '+=300%', // stays visible longer
         scrub: 1.5,
         markers: false,
         onEnter: () => video.play().catch(e => console.warn('Play failed:', e)),
@@ -57,34 +57,34 @@ const ScrollVideoTransition = () => {
       }
     })
 
-    // Fade & slide in
+    // Slide/Fade In
     tl.fromTo(container,
       { x: '120%', opacity: 0 },
-      { x: '0%', opacity: 1, duration: 0.8, ease: 'power4.out' }
+      { x: '0%', opacity: 1, duration: 1, ease: 'power4.out' }
     )
     .fromTo(videoWrapper,
       { scale: 0.85, rotateY: 12, filter: 'blur(10px)' },
-      { scale: 1, rotateY: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power4.out' },
+      { scale: 1, rotateY: 0, filter: 'blur(0px)', duration: 1, ease: 'power4.out' },
       '<'
     )
 
-    // Hold visible state
+    // Hold (fully visible)
     tl.to([container, videoWrapper], {
       x: '0%',
       opacity: 1,
       scale: 1,
       rotateY: 0,
       filter: 'blur(0px)',
-      duration: 0.6,
+      duration: 1,
       ease: 'none'
     })
 
-    // 🟥 Separate fade-left (starts when scrolled far below)
+    // 🟥 Strongly delayed fade-out
     gsap.timeline({
       scrollTrigger: {
         trigger: container,
-        start: 'bottom 40%',  // start fading after video almost passes viewport
-        end: 'bottom -20%',   // complete fade when it's gone
+        start: 'bottom+=120% center', // starts way later
+        end: 'bottom+=250% top', // super delayed fade-left
         scrub: 1.5,
         markers: false
       }
@@ -93,13 +93,13 @@ const ScrollVideoTransition = () => {
       scale: 0.85,
       rotateY: -12,
       filter: 'blur(10px)',
-      duration: 0.6,
+      duration: 0.8,
       ease: 'power4.in'
     })
     .to(container, {
       x: '-120%',
       opacity: 0,
-      duration: 0.6,
+      duration: 0.8,
       ease: 'power4.in'
     }, '<')
 
